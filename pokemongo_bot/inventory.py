@@ -651,7 +651,7 @@ class _Attacks(_StaticInventoryComponent):
                 by_type[attack_type] = []
             by_type[attack_type].append(attack)
 
-        for t in by_type.iterkeys():
+        for t in by_type.keys():
             attacks = sorted(by_type[t], key=lambda m: m.dps, reverse=True)
             min_dps = attacks[-1].dps
             max_dps = attacks[0].dps - min_dps
