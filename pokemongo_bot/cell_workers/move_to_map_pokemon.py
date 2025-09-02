@@ -347,7 +347,7 @@ class MoveToMapPokemon(BaseTask):
                         count += 1
                         if count >= self.config.get('snipe_max_in_chain', 2):
                             return WorkerResult.SUCCESS
-                        if count is not 1:
+                        if count != 1:
                             time.sleep(self.config.get('snipe_sleep_sec', 2) * 5)
                     else:
                         if self.debug:
