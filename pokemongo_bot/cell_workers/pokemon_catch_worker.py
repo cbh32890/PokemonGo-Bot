@@ -395,20 +395,20 @@ class PokemonCatchWorker(BaseTask):
         if pokemon_config.get('catch_above_iv',-1) >= 0: cr['iv'] = catch_results['iv']
 
         if DEBUG_ON:
-            print "Debug information for match rules..."
-            print "catch_results ncp = {}".format(catch_results['ncp'])
-            print "catch_results cp = {}".format(catch_results['cp'])
-            print "catch_results iv = {}".format(catch_results['iv'])
-            print "cr = {}".format(cr)
-            print "catch_above_ncp = {}".format(pokemon_config.get('catch_above_ncp'))
-            print "catch_above_cp iv = {}".format(pokemon_config.get('catch_above_cp'))
-            print "catch_below_cp iv = {}".format(pokemon_config.get('catch_below_cp'))
-            print "catch_above_iv iv = {}".format(pokemon_config.get('catch_above_iv'))
-            print "Pokemon {}".format(pokemon.name)
-            print "pokemon ncp = {}".format(pokemon.cp_percent)
-            print "pokemon cp = {}".format(pokemon.cp)
-            print "pokemon iv = {}".format(pokemon.iv)
-            print "catch logic = {}".format(catch_logic)
+            print("Debug information for match rules...")
+            print("catch_results ncp = {}".format(catch_results['ncp']))
+            print("catch_results cp = {}".format(catch_results['cp']))
+            print("catch_results iv = {}".format(catch_results['iv']))
+            print("cr = {}".format(cr))
+            print("catch_above_ncp = {}".format(pokemon_config.get('catch_above_ncp')))
+            print("catch_above_cp iv = {}".format(pokemon_config.get('catch_above_cp')))
+            print("catch_below_cp iv = {}".format(pokemon_config.get('catch_below_cp')))
+            print("catch_above_iv iv = {}".format(pokemon_config.get('catch_above_iv')))
+            print("Pokemon {}".format(pokemon.name))
+            print("pokemon ncp = {}".format(pokemon.cp_percent))
+            print("pokemon cp = {}".format(pokemon.cp))
+            print("pokemon iv = {}".format(pokemon.iv))
+            print("catch logic = {}".format(catch_logic))
 
         if LOGIC_TO_FUNCTION[catch_logic](*cr.values()):
             return catch_results['fa'] and catch_results['ca']
@@ -546,7 +546,7 @@ class PokemonCatchWorker(BaseTask):
         original_catch_rate_by_ball = catch_rate_by_ball
         
         if DEBUG_ON:
-            print "Pokemon Level: " + str(pokemon.level) + " Berries count: " + str(berry_count) + " Berries ID: " + str(berry_id) + " Catch rate: " + str(ideal_catch_rate_before_throw)
+            print("Pokemon Level: " + str(pokemon.level) + " Berries count: " + str(berry_count) + " Berries ID: " + str(berry_id) + " Catch rate: " + str(ideal_catch_rate_before_throw))
         
         while True:
 
