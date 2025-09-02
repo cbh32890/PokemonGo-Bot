@@ -172,8 +172,8 @@ def MakeConf(CurThread, username, password):
             response.close()
 
             if killswitch_data['killswitch']:
-                print "\033[91mKill Switch Activated By: \033[0m" + format(killswitch_data['activated_by'])
-                print "\033[91mMessage: \033[0m\n" + format(killswitch_data['message']) + "\n\n\n"
+                print("\033[91mKill Switch Activated By: \033[0m" + format(killswitch_data['activated_by']))
+                print("\033[91mMessage: \033[0m\n" + format(killswitch_data['message']) + "\n\n\n")
                 stop()
 
         if MultiBotConfig.get(u'CompleteTutorialNickName'):

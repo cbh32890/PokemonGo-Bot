@@ -90,14 +90,14 @@ def main():
         # raw_input returns the empty string for "enter"
         yes = set(['yes','y', 'ye', ''])
         no = set(['no','n'])
-        print question
+        print(question)
         choice = raw_input().lower()
         if choice in yes:
             return True
         elif choice in no:
             return False
         else:
-            print "Please respond with 'yes' or 'no'"
+            print("Please respond with 'yes' or 'no'")
             return None
 
     def initialize(config):
@@ -116,8 +116,8 @@ def main():
             response.close()
 
             if killswitch_data['killswitch']:
-                print "\033[91mKill Switch Activated By: \033[0m" + format(killswitch_data['activated_by'])
-                print "\033[91mMessage: \033[0m\n" + format(killswitch_data['message']) + "\n\n\n"
+                print("\033[91mKill Switch Activated By: \033[0m" + format(killswitch_data['activated_by']))
+                print("\033[91mMessage: \033[0m\n" + format(killswitch_data['message']) + "\n\n\n")
                 sys.exit(1)
             
             if killswitch_data['show_warning']:
@@ -126,7 +126,7 @@ def main():
                     if killswitch_data['pause_bot'] and not bypass_warning:
                         yn = yes_no("\033[91mMessage: " + format(killswitch_data['message'])+ "\033[0m\nDo you wish to continue? Y/N")
                     else:
-                        print "\033[91mMessage: " + format(killswitch_data['message']) + "\033[0m\n"
+                        print("\033[91mMessage: " + format(killswitch_data['message']) + "\033[0m\n")
                         yn = True
                         time.sleep(5)
                 if not yn:
@@ -141,18 +141,18 @@ def main():
                     if not bypass_warning:
                         yn = yes_no("Warning: A new pokemon API version is found.\n Run following command to get latest update: `pip install -r requirements.txt --upgrade` \n Do you want to contine? Y/N")
                     else:
-                        print "Warning: A new pokemon API version is found.\n Run following command to get latest update: `pip install -r requirements.txt --upgrade` \n You have chose to bypass warning, bot will continue running."
+                        print("Warning: A new pokemon API version is found.\n Run following command to get latest update: `pip install -r requirements.txt --upgrade` \n You have chose to bypass warning, bot will continue running.")
                         yn = True
                         time.sleep(5)
                 if not yn:
                     sys.exit(1)
 
         except pkg_resources.DistributionNotFound:
-            print 'Seems you forgot to install python modules.'
-            print 'Run: `pip install -r requirements.txt`'
+            print('Seems you forgot to install python modules.')
+            print('Run: `pip install -r requirements.txt`')
             sys.exit(1)
         except ImportError as e:
-            print e
+            print(e)
             pass
 
         ds = Datastore(conn_str='/data/{}.db'.format(config.username))
