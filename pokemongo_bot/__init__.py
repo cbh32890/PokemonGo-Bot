@@ -14,7 +14,7 @@ import queue
 import threading
 import shelve
 import uuid
-import urllib2
+import urllib.request
 import calendar
 
 from geopy.geocoders import GoogleV3
