@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 import json
-import thread
+import _thread
 import time
 from socket import error as socket_error
 
@@ -22,7 +22,7 @@ class MyMQTTClass:
         self._mqttc = None
 
     def mqtt_on_connect(self, mqttc, obj, flags, rc):
-        if rc is 0:
+        if rc == 0:
             self._mqttc.subscribe("pgo/#", 1)
         if DEBUG_ON:
             print("rc: " + str(rc))
@@ -33,7 +33,7 @@ class MyMQTTClass:
 
         pokemon = json.loads(msg.payload)
         if pokemon and 'encounter_id' in pokemon:
-            new_list = [x for x in self.bot.mqtt_pokemon_list if x['encounter_id'] is pokemon['encounter_id']]
+            new_list = [x for x in self.bot.mqtt_pokemon_list if x['encounter_id'] == pokemon['encounter_id']]
             if not (new_list and len(new_list) > 0):
                 if len(self.bot.mqtt_pokemon_list) > self.MAX_RESULTS:
                     del self.bot.mqtt_pokemon_list[:]
@@ -106,7 +106,7 @@ class SocialHandler(EventHandler):
         self.mqttc = None
 
     def handle_event(self, event, sender, level, formatted_msg, data):
-        if self.mqttc is None:
+        if self.mqttc == None:
             try:
                 if DEBUG_ON:
                     print('need connect')
@@ -114,7 +114,7 @@ class SocialHandler(EventHandler):
                 self.mqttc = MyMQTTClass(self.bot, self.bot.config.client_id)
                 self.mqttc.initialize()
                 self.bot.mqttc = self.mqttc
-                thread.start_new_thread(self.mqttc.run)
+                _thread.start_new_thread(self.mqttc.run)
             except socket_error as serr:
                 # if serr.errno == errno.ECONNREFUSED:
                 # ECONNREFUSED
