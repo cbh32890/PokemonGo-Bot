@@ -12,9 +12,9 @@
 # 
 # docker build --build-arg BUILD_REPO=YourFork/PokemonGo-Bot --build-arg BUILD_BRANCH=6a4580f .
 
-FROM alpine
+FROM python:3.12-alpine3.22
 
-ARG BUILD_REPO=PokemonGoF/PokemonGo-Bot
+ARG BUILD_REPO=cbh32890/PokemonGo-Bot
 ARG BUILD_BRANCH=master
 
 LABEL build_repo=$BUILD_REPO build_branch=$BUILD_BRANCH
@@ -26,14 +26,14 @@ RUN apk -U --no-cache add python3 py3-pip tzdata \
     && rm -rf /var/cache/apk/* \
     && find / -name '*.pyc' -o -name '*.pyo' | xargs -rn1 rm -f
 
-ADD https://raw.githubusercontent.com/$BUILD_REPO/$BUILD_BRANCH/requirements.txt .
+COPY requirements.txt .
 
 #Need to load cert for WGET
 RUN apk update
 RUN apk add ca-certificates wget
 RUN update-ca-certificates
 
-RUN apk -U --no-cache add --virtual .build-dependencies python3-dev gcc make musl-dev git
+RUN apk -U --no-cache add --virtual .build-dependencies python3-dev gcc g++ make musl-dev git gfortran openblas-dev libffi-dev openssl-dev
 RUN ln -s locale.h /usr/include/xlocale.h
 RUN python3 -m venv /usr/src/app/venv
 RUN /usr/src/app/venv/bin/python3 -m ensurepip --upgrade
@@ -51,4 +51,4 @@ RUN apk -U --no-cache add --virtual .pgobot-dependencies wget ca-certificates ta
     && apk del .pgobot-dependencies \
     && rm -rf /var/cache/apk/* /tmp/pgobot-version
 
-CMD ["python", "pokecli.py"]
+CMD ["/usr/src/app/venv/bin/python3", "pokecli.py"]

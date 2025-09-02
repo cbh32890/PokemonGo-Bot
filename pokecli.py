@@ -29,7 +29,7 @@ from __future__ import unicode_literals
 import argparse
 import codecs
 import json
-import urllib2
+import urllib.request
 import logging
 import os
 import six
@@ -111,7 +111,7 @@ def main():
             bypass_warning = False
             
         if config.killswitch:
-            response = urllib2.urlopen(killswitch_url)
+            response = urllib.request.urlopen(killswitch_url)
             killswitch_data = json.load(response)
             response.close()
 
