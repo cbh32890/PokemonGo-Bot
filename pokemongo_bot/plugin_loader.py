@@ -56,7 +56,7 @@ class GithubPlugin(object):
     return self.plugin_parts is not None
 
   def get_github_parts(self):
-    groups = re.match('(.*)\/(.*)#(.*)', self.plugin_name)
+    groups = re.match(r'(.*)\/(.*)#(.*)', self.plugin_name)
 
     if groups is None:
       return None

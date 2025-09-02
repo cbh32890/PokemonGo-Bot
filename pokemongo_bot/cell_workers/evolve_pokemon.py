@@ -110,7 +110,7 @@ class EvolvePokemon(BaseTask):
             response_dict_lucky_egg = self.bot.use_lucky_egg()
             if response_dict_lucky_egg:
                 result = response_dict_lucky_egg.get('responses', {}).get('USE_ITEM_XP_BOOST', {}).get('result', 0)
-                if result is 1:  # Request success
+                if result == 1:  # Request success
                     self.start_time = time.time()
                     lucky_egg.remove(1)
                     self.emit_event(

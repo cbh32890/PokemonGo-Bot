@@ -563,7 +563,7 @@ class Types(_StaticInventoryComponent):
         size = len(ret)
         by_effectiveness = {}
         by_resistance = {}
-        for t in ret.itervalues():  # type: Type
+        for t in ret.values():  # type: Type
             t.attack_effective_against = [ret[name] for name in t.attack_effective_against]
             t.attack_weak_against = [ret[name] for name in t.attack_weak_against]
 
@@ -581,7 +581,7 @@ class Types(_StaticInventoryComponent):
                       - ((1-RESISTANCE_FACTOR) * len(t.attack_weak_against))) / size
 
         # set pokemon type resistance/weakness info
-        for t in ret.itervalues():  # type: Type
+        for t in ret.values():  # type: Type
             t.pokemon_resistant_to = by_resistance[t]
             t.pokemon_vulnerable_to = by_effectiveness[t]
 
@@ -1010,7 +1010,7 @@ class Pokemon(object):
         if 'deployed_fort_id' in data:
             self.fort_id = data['deployed_fort_id']
 
-        self.is_favorite = data.get('favorite', 0) is 1
+        self.is_favorite = data.get('favorite', 0) == 1
         self.buddy_candy = data.get('buddy_candy_awarded', 0)
         self.is_bad = data.get('is_bad', False)
         self.buddy_distance_needed = self.static.buddy_distance_needed
