@@ -9,7 +9,6 @@ import difflib
 import hashlib
 from random import uniform
 from operator import itemgetter, methodcaller
-from itertools import izip
 from pokemongo_bot import inventory
 from pokemongo_bot.item_list import Item
 from pokemongo_bot.base_task import BaseTask
