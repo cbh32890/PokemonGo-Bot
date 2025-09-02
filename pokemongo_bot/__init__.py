@@ -10,7 +10,7 @@ import random
 import re
 import sys
 import time
-import Queue
+import queue
 import threading
 import shelve
 import uuid
@@ -126,7 +126,7 @@ class PokemonGoBot(object):
         self.workers = []
 
         # Theading setup for file writing
-        self.web_update_queue = Queue.Queue(maxsize=1)
+        self.web_update_queue = queue.Queue(maxsize=1)
         self.web_update_thread = threading.Thread(target=self.update_web_location_worker)
         self.web_update_thread.start()
 
@@ -1534,7 +1534,7 @@ class PokemonGoBot(object):
         # Check if the given location is already a coordinate.
         if ',' in location_name:
             possible_coordinates = re.findall(
-                "[-]?\d{1,3}(?:[.]\d+)?", location_name
+                r"[-]?\d{1,3}(?:[.]\d+)?", location_name
             )
             if len(possible_coordinates) >= 2:
                 # 2 matches, this must be a coordinate. We'll bypass the Google
@@ -1558,7 +1558,7 @@ class PokemonGoBot(object):
         for location in self.config.favorite_locations:
             if location.get('name').lower() == location_name:
                 coords = re.findall(
-                    "[-]?\d{1,3}[.]\d{3,7}", location.get('coords').strip()
+                    r"[-]?\d{1,3}[.]\d{3,7}", location.get('coords').strip()
                 )
                 if len(coords) >= 2:
                     self.logger.info('Favorite location found: {} ({})'.format(location_name, coords))
@@ -1698,7 +1698,7 @@ class PokemonGoBot(object):
 
         try:
             self.web_update_queue.put_nowait(True)  # do this outside of thread every tick
-        except Queue.Full:
+        except queue.Full:
             pass
 
         threading.Timer(self.heartbeat_threshold, self.heartbeat).start()

@@ -6,7 +6,7 @@ geopy>=2.4.1
 geographiclib>=2.0
 requests>=2.32.3
 requests-mock>=1.12.1
-protobuf==3.20.1
+protobuf==5.28.2
 s2sphere>=0.2.5
 git+https://github.com/cbh32890/gpsoauth.git@master
 googlemaps>=4.10.0
@@ -33,5 +33,5 @@ git+https://github.com/cbh32890/discord_simple.git@master
 urllib3>=2.2.3
 selenium>=4.25.0
 pytz>=2024.2
-protobuf3_to_dict>=0.1.5
+git+https://github.com/cbh32890/protobuf-to-dict.git@master
 pycryptodome>=3.20.0
