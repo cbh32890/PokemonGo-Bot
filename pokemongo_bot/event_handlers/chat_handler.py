@@ -174,7 +174,7 @@ class ChatHandler:
             msg = "*You have reached your daily catch limit, quitting.*"
         if event == 'spin_limit':
             msg = "*You have reached your daily spin limit, quitting.*"
-        if msg is None:
+        if msg == None:
             return formatted_msg
         else:
             return msg

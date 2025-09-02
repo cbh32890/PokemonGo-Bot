@@ -5,7 +5,7 @@ import json
 import os
 import time
 import discord_simple
-import thread
+import _thread
 import re
 from pokemongo_bot.datastore import Datastore
 from pokemongo_bot import inventory
@@ -83,12 +83,12 @@ class DiscordHandler(EventHandler):
             return False
 
     def handle_event(self, event, sender, level, formatted_msg, data):
-        if self.dbot is None:
+        if self.dbot == None:
             try:
                 self.bot.logger.info("Discord bot not running, Starting..")
                 self.dbot = DiscordClass(self.bot, self.master, self.pokemons, self.config)
                 self.dbot.connect()
-                thread.start_new_thread(self.dbot.run)
+                _thread.start_new_thread(self.dbot.run)
             except Exception as inst:
                 self.dbot = None
                 self.bot.logger.error("Unable to start Discord bot; master: {}, exception: {}".format(self.master, pprint.pformat(inst)))
