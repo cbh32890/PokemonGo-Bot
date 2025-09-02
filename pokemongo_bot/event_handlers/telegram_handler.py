@@ -2,7 +2,7 @@
 from pokemongo_bot.event_manager import EventHandler
 import time
 import telegram
-import thread
+import _thread
 import re
 from telegram.utils import request
 from chat_handler import ChatHandler
@@ -37,9 +37,9 @@ class TelegramClass:
         with self.bot.database as conn:
             # initialize the DB table if it does not exist yet
             initiator = TelegramDBInit(bot.database)
-            if unicode(self.master).isnumeric():  # master is numeric
+            if str(self.master).isnumeric():  # master is numeric
                 self.bot.logger.info("Telegram master is valid (numeric): {}".format(self.master))
-            elif self.master is not None:  # Master is not numeric, fetch from db
+            elif self.master != None:  # Master is not numeric, fetch from db
                 self.bot.logger.info("Telegram master is not numeric: {}".format(self.master))
                 c = conn.cursor()
                 srchmaster = re.sub(r'^@', '', self.master)
@@ -75,14 +75,14 @@ class TelegramClass:
     def isMasterFromConfigFile(self, chat_id):
         if not hasattr(self, "master") or not self.master:
             return False
-        if unicode(self.master).isnumeric():
-            return unicode(chat_id) == unicode(self.master)
+        if str(self.master).isnumeric():
+            return str(chat_id) == str(self.master)
         else:
             with self.bot.database as conn:
                 cur = conn.cursor()
                 cur.execute("select username from telegram_uids where uid = ?", [chat_id])
                 res = cur.fetchone()
-                return res != None and unicode(res[0]) == unicode(re.replace(r'^@', '', self.master))
+                return res != None and str(res[0]) == str(re.replace(r'^@', '', self.master))
 
     def isMasterFromActiveLogins(self, chat_id):
         with self.bot.database as conn:
@@ -125,7 +125,7 @@ class TelegramClass:
 
     def sendMessage(self, chat_id=None, parse_mode='Markdown', text=None):
         try:
-            if self._tbot is None:
+            if self._tbot == None:
                 self.connect()
             self._tbot.sendMessage(chat_id=chat_id, parse_mode=parse_mode, text=text)
         except telegram.error.NetworkError:
@@ -406,7 +406,7 @@ class TelegramClass:
             for sub in conn.execute("select uid, event_type, parameters from telegram_subscriptions where uid = ?",
                                     [update.message.chat_id]).fetchall():
                 subs.append("{} -&gt; {}".format(sub[1], sub[2]))
-        if subs is []: subs.append(
+        if subs == []: subs.append(
             "No subscriptions found. Subscribe using /sub EVENTNAME. For a list of events, send /events")
         self.sendMessage(chat_id=update.message.chat_id, parse_mode='HTML', text="\n{}".join(subs))
 
@@ -501,7 +501,7 @@ class TelegramClass:
         time.sleep(1)
         while True:
             if DEBUG_ON: self.bot.logger.info("Telegram loop running")
-            if self._tbot is None:
+            if self._tbot == None:
                 self.connect()
             for update in self._tbot.getUpdates(offset=self.update_id, timeout=10):
                 self.update_id = update.update_id + 1
@@ -518,8 +518,8 @@ class TelegramClass:
                         self.is_configured(update)
                         continue
                     if not self.isAuthenticated(update.message.from_user.id) and hasattr(self,
-                            "master") and self.master and not unicode(self.master).isnumeric() and \
-                            unicode(self.master) == unicode(update.message.from_user.username):
+                            "master") and self.master and not str(self.master).isnumeric() and \
+                            str(self.master) == str(update.message.from_user.username):
                         self.is_master_numeric(update)
                         continue
                     if not self.isAuthenticated(update.message.from_user.id):
@@ -688,7 +688,7 @@ class TelegramDBInit:
         if res and len(res) > 0 and res[0] != sql:  # object exists and sql not matching
             self.conn.execute("drop {} {}".format(res[1], name))  # drop it
 
-        if res is None or len(res) == 0 or res[0] != sql:  # object missing or sql not matching
+        if res == None or len(res) == 0 or res[0] != sql:  # object missing or sql not matching
             self.conn.execute(sql)
         return
 
@@ -705,10 +705,10 @@ class TelegramHandler(EventHandler):
         self._connect()
 
     def _connect(self):
-        if self.tbot is None:
+        if self.tbot == None:
             self.bot.logger.info("Telegram bot not running. Starting")
             self.tbot = TelegramClass(self.bot, self.pokemons, self.config)
-            thread.start_new_thread(self.tbot.run)
+            _thread.start_new_thread(self.tbot.run)
         return self.tbot
 
     def catch_notify(self, pokemon, cp, iv, params):
@@ -747,12 +747,12 @@ class TelegramHandler(EventHandler):
 
                     if DEBUG_ON: self.bot.logger.info("Telegram message {}".format(msg))
 
-                    if msg is None: return
+                    if msg == None: return
                 else:
                     if DEBUG_ON: self.bot.logger.info("No match sub {} event {}".format(sub, event))
 
-        if msg is not None:
-            if self.tbot is None:  # instantiate tbot (TelegramClass) if not already set
+        if msg != None:
+            if self.tbot == None:  # instantiate tbot (TelegramClass) if not already set
                 if DEBUG_ON:
                     self.bot.logger.info("handle_event Telegram bot not running.")
                 try:
@@ -762,6 +762,6 @@ class TelegramHandler(EventHandler):
                     self.tbot = None
                     return
 
-            if self.tbot is not None:  # tbot should be running, but just in case it hasn't started yet
+            if self.tbot != None:  # tbot should be running, but just in case it hasn't started yet
 
                 self.tbot.sendMessage(chat_id=uid, parse_mode='Markdown', text=msg)
