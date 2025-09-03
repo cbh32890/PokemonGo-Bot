@@ -26,7 +26,7 @@ Author: tjado <https://github.com/tejado>
 """
 import eventlet
 eventlet.monkey_patch()
-from __future__ import unicode_literals
+
 
 import argparse
 import codecs
