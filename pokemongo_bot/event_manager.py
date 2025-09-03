@@ -61,7 +61,7 @@ class Event(object):
         t = datetime.today()
         self.timestamp = t.strftime('%Y-%m-%d %H:%M:%S')
         self.event = str(event)  # Keep as str
-        self.sender = str(sender) if sender is not None else None  # Keep as str or None
+        self.sender = str(sender) if sender != None else None  # Keep as str or None
         self.level = str(level)  # Keep as str
         try:
             self.formatted = str(formatted)  # Keep as str
