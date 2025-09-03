@@ -60,7 +60,7 @@ class CaptchaHandler(EventHandler):
             WebDriverWait(driver, 60).until(EC.text_to_be_present_in_element_value((By.NAME, "g-recaptcha-response"), ""))
             token = driver.execute_script("return grecaptcha.getResponse()")
             driver.close()
-        except TimeoutException, err:
+        except TimeoutException as err:
             self.bot.logger.error('Timed out while trying to solve captcha')
         driver.quit()
         return token
