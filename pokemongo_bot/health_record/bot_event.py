@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import logging
-from sentry_sdk import init, capture_exception
-from sentry_sdk.transport import HttpTransport  # Add this import
 import uuid
 import requests
 import time
@@ -19,28 +17,13 @@ class BotEvent(object):
         if self.config.get('health_record'):
             self.logger.info('Health check is enabled. For more information:')
             self.logger.info('https://github.com/PokemonGoF/PokemonGo-Bot/tree/dev#analytics')
-            init(
-                dsn='https://8abac56480f34b998813d831de262514:196ae1d8dced41099f8253ea2c8fe8e6@app.getsentry.com/90254',
-                environment='PokemonGoF-Bot',
-                transport=HttpTransport,  # Use synchronous transport
-                processors=(
-                    'sentry_sdk.integrations.stdlib.SanitizePasswordsProcessor',
-                    'sentry_sdk.integrations.stdlib.RemoveStackLocalsProcessor'
-                ),
-                enable_tracing=False,
-                enable_breadcrumbs=False,
-                attach_stacktrace=True
-            )
 
         self.heartbeat_wait = 15 * 60  # seconds
         self.last_heartbeat = time.time()
 
     def capture_error(self):
         if self.config.get('health_record'):
-            try:
-                capture_exception()
-            except Exception as e:
-                self.logger.error(f"Failed to report error to Sentry: {e}")
+            self.logger.error("Sentry error reporting is disabled")
 
     def login_success(self):
         if self.config.get('health_record'):
