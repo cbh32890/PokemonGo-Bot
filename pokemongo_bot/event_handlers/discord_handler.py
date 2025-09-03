@@ -9,7 +9,7 @@ import _thread
 import re
 from pokemongo_bot.datastore import Datastore
 from pokemongo_bot import inventory
-from chat_handler import ChatHandler
+from .chat_handler import ChatHandler
 import pprint
 
 
