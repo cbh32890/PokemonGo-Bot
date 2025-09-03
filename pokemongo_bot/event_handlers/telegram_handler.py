@@ -4,7 +4,7 @@ import time
 import re
 import telegram
 from pokemongo_bot.event_manager import EventHandler
-from chat_handler import ChatHandler
+from .chat_handler import ChatHandler
 from pokemongo_bot.inventory import Pokemons
 from pokemongo_bot import inventory
 from pokemongo_bot.item_list import Item
