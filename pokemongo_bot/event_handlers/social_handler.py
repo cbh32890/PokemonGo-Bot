@@ -88,17 +88,17 @@ class MyMQTTClass:
     def run(self):
         try:
             self._mqttc.connect("broker.pikabot.org", 1883, 20)
-        except:
-            print('Error occured in social handler')
+        except Exception as e:
+            print(f'Error occurred in social handler: {e}')
         while True:
             try:
-                self._mqttc.loop_forever(timeout=30.0, max_packets=100, retry_first_connection=False)
-                print('Oops disconnected ?')
+                self._mqttc.loop_forever(timeout=30.0, retry_first_connection=False)
+                print('Oops disconnected?')
                 time.sleep(20)
             except UnicodeDecodeError:
                 time.sleep(1)
             except Exception as e:
-                print(e)
+                print(f'Unexpected error in MQTT loop: {e}')
                 time.sleep(10)
 
 
