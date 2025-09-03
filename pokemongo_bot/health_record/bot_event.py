@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
-from raven import Client
-import raven
+from sentry_sdk import init, capture_exception
 import uuid
 import requests
 import time
@@ -12,62 +11,54 @@ class BotEvent(object):
     def __init__(self, config):
         self.config = config
         self.logger = logging.getLogger(__name__)
-        #client_id_file_path = os.path.join(_base_dir, 'data', 'client_id')
-        #saved_info = shelve.open(client_id_file_path)
-        #if saved_info.has_key('client_id'):
-        #    self.client_id = saved_info['client_id']
-        #else:
-        #    client_uuid = uuid.uuid4()
-        #    self.client_id = str(client_uuid)
-        #    saved_info['client_id'] = self.client_id
-        #saved_info.close()
         client_uuid = uuid.uuid4()
         self.client_id = str(client_uuid)
         # UniversalAnalytics can be reviewed here:
         # https://github.com/analytics-pros/universal-analytics-python
-        if self.config.health_record:
+        if self.config.get('health_record'):
             self.logger.info('Health check is enabled. For more information:')
             self.logger.info('https://github.com/PokemonGoF/PokemonGo-Bot/tree/dev#analytics')
-            self.client = Client(
+            init(
                 dsn='https://8abac56480f34b998813d831de262514:196ae1d8dced41099f8253ea2c8fe8e6@app.getsentry.com/90254',
-                name='PokemonGof-Bot',
-                processors = (
-                    'raven.processors.SanitizePasswordsProcessor',
-                    'raven.processors.RemoveStackLocalsProcessor'
+                environment='PokemonGoF-Bot',
+                processors=(
+                    'sentry_sdk.integrations.stdlib.SanitizePasswordsProcessor',
+                    'sentry_sdk.integrations.stdlib.RemoveStackLocalsProcessor'
                 ),
-                install_logging_hook = False,
-                hook_libraries = (),
-                enable_breadcrumbs = False,
-                logging = False,
-                context = {}
+                enable_tracing=False,
+                enable_breadcrumbs=False,
+                attach_stacktrace=True
             )
 
-        self.heartbeat_wait = 15*60 # seconds
+        self.heartbeat_wait = 15 * 60  # seconds
         self.last_heartbeat = time.time()
 
     def capture_error(self):
-        if self.config.health_record:
-            self.client.captureException()
+        if self.config.get('health_record'):
+            try:
+                capture_exception()
+            except Exception as e:
+                self.logger.error(f"Failed to report error to Sentry: {e}")
 
     def login_success(self):
-        if self.config.health_record:
+        if self.config.get('health_record'):
             self.last_heartbeat = time.time()
             self.track_url('/loggedin')
 
     def login_failed(self):
-        if self.config.health_record:
+        if self.config.get('health_record'):
             self.track_url('/login')
 
     def login_retry(self):
-        if self.config.health_record:
+        if self.config.get('health_record'):
             self.track_url('/relogin')
 
     def logout(self):
-        if self.config.health_record:
+        if self.config.get('health_record'):
             self.track_url('/logout')
 
     def heartbeat(self):
-        if self.config.health_record:
+        if self.config.get('health_record'):
             current_time = time.time()
             if current_time - self.heartbeat_wait > self.last_heartbeat:
                 self.last_heartbeat = current_time
@@ -77,7 +68,7 @@ class BotEvent(object):
         data = {
             'v': '1',
             'tid': 'UA-81469507-1',
-            'aip': '1', # Anonymize IPs
+            'aip': '1',  # Anonymize IPs
             'cid': self.client_id,
             't': 'pageview',
             'dp': path
@@ -85,7 +76,6 @@ class BotEvent(object):
         try:
             response = requests.post(
                 'http://www.google-analytics.com/collect', data=data)
-
             response.raise_for_status()
         except requests.exceptions.HTTPError:
             pass
