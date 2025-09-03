@@ -2,6 +2,7 @@
 from __future__ import print_function
 import json
 import _thread
+import uuid
 import time
 from socket import error as socket_error
 
@@ -69,7 +70,9 @@ class MyMQTTClass:
             if DEBUG_ON:
                 print('connect again')
 
-            self._mqttc = mqtt.Client(None)
+            # use provided client_id or generate new one
+            client_id = self.client_id or str(uuid.uuid4())
+            self._mqttc = mqtt.Client(client_id=client_id, protocol=mqtt.MQTTv311)
             self._mqttc.on_message = self.mqtt_on_message
             self._mqttc.on_connect = self.mqtt_on_connect
             self._mqttc.on_subscribe = self.mqtt_on_subscribe
@@ -78,8 +81,8 @@ class MyMQTTClass:
 
             # Enable this line if you are doing the snip code, off stress
             # self._mqttc.loop_start()
-        except TypeError:
-            print('Connect to mqtter error')
+        except TypeError as e:
+            print(f'Connect to MQTT error: {e}')
             return
 
     def run(self):
