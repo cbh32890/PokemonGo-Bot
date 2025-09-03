@@ -22,7 +22,7 @@ eventlet>=0.36.1
 gpxpy>=1.6.2
 mock==2.0.0
 timeout-decorator>=0.5.0
-sentry-sdk>=2.16.0  # Replaced raven
+sentry-sdk>=1.40.0  # Replaced raven
 demjson3>=3.0.6  # Replaced demjson
 greenlet>=3.1.1
 yoyo-migrations>=8.2.0
