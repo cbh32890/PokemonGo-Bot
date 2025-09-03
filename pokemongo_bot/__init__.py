@@ -170,7 +170,7 @@ class PokemonGoBot(object):
 
         client_id_file_path = os.path.join(_base_dir, 'data', 'mqtt_client_id')
         saved_info = shelve.open(client_id_file_path)
-        key = 'client_id'.encode('utf-8')
+        key = 'client_id'
         if key in saved_info:
             self.config.client_id = saved_info[key]
         else:
