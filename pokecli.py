@@ -964,7 +964,7 @@ def add_config(parser, json_config, short_flag=None, long_flag=None, **kwargs):
 def fix_nested_config(config):
     config_dict = config.__dict__
 
-    for key, value in config_dict.iteritems():
+    for key, value in config_dict.items():
         if '.' in key:
             new_key = key.replace('.', '_')
             config_dict[new_key] = value
