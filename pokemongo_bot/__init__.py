@@ -172,11 +172,13 @@ class PokemonGoBot(object):
         saved_info = shelve.open(client_id_file_path)
         key = 'client_id'
         if key in saved_info:
-            self.config.client_id = saved_info[key]
+            self.config.client_id = str(saved_info[key])
         else:
             self.config.client_id = str(uuid.uuid4())
             saved_info[key] = self.config.client_id
         saved_info.close()
+        self.config.device_id = self.config.client_id
+        self.config.username = str(self.config.username)
     
     def start(self, bot):
         self._setup_event_system(bot)
