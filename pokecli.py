@@ -235,7 +235,9 @@ def main():
             return
 
         logger.info('Configuration initialized')
-        health_record = BotEvent(config)
+        # convert namespace to dict if needed
+        config_dict = vars(config) if isinstance(config, Namespace) else config
+        health_record = BotEvent(config_dict)
         health_record.login_success()
 
         setup_logging(config)
