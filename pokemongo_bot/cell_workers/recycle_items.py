@@ -147,7 +147,7 @@ class RecycleItems(BaseTask):
             self._schedule_next_force()
             return True
         
-        if inventory.Items.get_space_left() <= (DEFAULT_MIN_EMPTY_SPACE if self.min_empty_space is None else self.min_empty_space):
+        if inventory.Items.get_space_left() <= (DEFAULT_MIN_EMPTY_SPACE if self.min_empty_space == None else self.min_empty_space):
             return True
         return False
 
@@ -161,22 +161,22 @@ class RecycleItems(BaseTask):
         worker_result = WorkerResult.SUCCESS
         if self.should_run():
 
-            if not (self.max_balls_keep is None):
+            if not (self.max_balls_keep == None):
                 this_worker_result = self.recycle_excess_category_max(self.max_balls_keep, [1,2,3,4])
                 if this_worker_result != WorkerResult.SUCCESS:
                     worker_result = this_worker_result
                     
-            if not (self.max_potions_keep is None):
+            if not (self.max_potions_keep == None):
                 this_worker_result =  self.recycle_excess_category_max(self.max_potions_keep, [101,102,103,104])
                 if this_worker_result != WorkerResult.SUCCESS:
                     worker_result = this_worker_result
                    
-            if not (self.max_berries_keep is None):
+            if not (self.max_berries_keep == None):
                 this_worker_result =  self.recycle_excess_category_max(self.max_berries_keep, [701,702,703,704,705])
                 if this_worker_result != WorkerResult.SUCCESS:
                     worker_result = this_worker_result
                     
-            if not (self.max_revives_keep is None):
+            if not (self.max_revives_keep == None):
                 this_worker_result = self.recycle_excess_category_max(self.max_revives_keep, [201,202])
                 if this_worker_result != WorkerResult.SUCCESS:
                     worker_result = this_worker_result
@@ -273,7 +273,7 @@ class RecycleItems(BaseTask):
         :rtype: int
         """
         amount_to_keep = self.get_amount_to_keep(item)
-        return 0 if amount_to_keep is None else item.count - amount_to_keep
+        return 0 if amount_to_keep == None else item.count - amount_to_keep
 
     def get_amount_to_keep(self, item):
         """
@@ -283,9 +283,9 @@ class RecycleItems(BaseTask):
         :rtype: int
         """
         item_filter_config = self.items_filter.get(item.name, 0)
-        if item_filter_config is not 0:
+        if item_filter_config != 0:
             return item_filter_config.get('keep', 20)
         else:
             item_filter_config = self.items_filter.get(str(item.id), 0)
-            if item_filter_config is not 0:
+            if item_filter_config != 0:
                 return item_filter_config.get('keep', 20)

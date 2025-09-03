@@ -102,7 +102,7 @@ class HealPokemon(BaseTask):
                 revive_item = inventory.items().get(item)
                 # Remove the revive from the iventory
                 revive_item.remove(1)
-                if result is 1:  # Request success
+                if result == 1:  # Request success
                     self.emit_event(
                         'revived_pokemon',
                         formatted='Revived {name}.',
@@ -220,7 +220,7 @@ class HealPokemon(BaseTask):
         sleep(2)
         if response_dict_potion:
             result = response_dict_potion.get('responses', {}).get('USE_ITEM_POTION', {}).get('result', 0)
-            if result is 1 or result is 0:  # Request success
+            if result == 1 or result == 0:  # Request success
                 potion_item = inventory.items().get(potion_id)
                 # Remove the potion from the iventory
                 potion_item.remove(1)
@@ -261,4 +261,4 @@ class HealPokemon(BaseTask):
         :return: True if the stats should be displayed; otherwise, False.
         :rtype: bool
         """
-        return self.next_update is None or datetime.now() >= self.next_update
+        return self.next_update == None or datetime.now() >= self.next_update

@@ -65,7 +65,7 @@ class UseIncense(BaseTask):
             response_dict = request.call()
             
             result = response_dict.get('responses', {}).get('USE_INCENSE', {}).get('result', 0)
-            if result is 1:
+            if result == 1:
                 self.emit_event(
                     'use_incense',
                     formatted="Using {type} incense. {incense_count} incense remaining",

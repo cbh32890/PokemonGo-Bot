@@ -47,7 +47,7 @@ class PokemonOptimizer(BaseTask):
         with open(pokemon_upgrade_cost_file, "r") as fd:
             self.pokemon_upgrade_cost = json.load(fd)
 
-        if self.config.get("keep", None) is not None:
+        if self.config.get("keep", None) != None:
             raise ConfigException("Pokemon Optimizer configuration has changed. See docs/pokemon_optimized.md or configs/config.json.optimizer.example")
 
         if self.debug:
@@ -91,13 +91,13 @@ class PokemonOptimizer(BaseTask):
         if (not self.config_may_use_lucky_egg) and self.config_evolve_only_with_lucky_egg:
             self.config_evolve = False
 
-        if self.config_evolve_for_xp is True:
+        if self.config_evolve_for_xp == True:
             self.config_evolve_for_xp = ["Caterpie", "Weedle", "Pidgey", "Rattata", "Nidoran F", "Nidoran M",
                                          "Zubat", "Oddish", "Paras", "Venonat", "Psyduck", "Tentacool",
                                          "Magnemite", "Krabby", "Voltorb", "Goldeen", "Staryu", "Eevee",
                                          "Sentret", "Swinub", "Hoothoot", "Ledyba", "Natu", "Spinarak", 
                                          "Wooper", "Marill", "Remoraid"]
-        elif self.config_evolve_for_xp is False:
+        elif self.config_evolve_for_xp == False:
             self.config_evolve_for_xp = []
 
         self.config_evolve_for_xp_whitelist, self.config_evolve_for_xp_blacklist = self.get_colorlist(self.config_evolve_for_xp)
@@ -120,7 +120,7 @@ class PokemonOptimizer(BaseTask):
         self.log_file.flush()
 
     def active_lucky_egg(self):
-        if self.used_lucky_egg is None:
+        if self.used_lucky_egg == None:
             return False
         # If last used is bigger then 30 minutes ago
         if self.used_lucky_egg > datetime.datetime.now()-datetime.timedelta(minutes=30):
@@ -264,7 +264,7 @@ class PokemonOptimizer(BaseTask):
                 self.logger.info("Marking %s Pokemon as favorite", len(try_favor_all))
 
                 for pokemon in try_favor_all:
-                    if pokemon.is_favorite is False:
+                    if pokemon.is_favorite == False:
                         self.favor_pokemon(pokemon)
 
             if (not self.lock_buddy) and (len(buddy_all) > 0):
@@ -438,7 +438,7 @@ class PokemonOptimizer(BaseTask):
         for pokemon in pokemon_list:
             setattr(pokemon, "__score__", self.get_score(pokemon, rule))
 
-        keep = [p for p in pokemon_list if p.__score__[1] is True]
+        keep = [p for p in pokemon_list if p.__score__[1] == True]
         keep.sort(key=lambda p: p.__score__[0], reverse=True)
 
         return keep
@@ -471,7 +471,7 @@ class PokemonOptimizer(BaseTask):
         may_try_upgrade &= self.satisfy_requirements(pokemon, rule_upgrade)
 
         may_buddy = rule_buddy not in [False, {}]
-        may_buddy &= pokemon.in_fort is False
+        may_buddy &= pokemon.in_fort == False
         may_buddy &= self.satisfy_requirements(pokemon, may_buddy)
 
         may_favor = rule_favor not in [False, {}]
@@ -483,7 +483,7 @@ class PokemonOptimizer(BaseTask):
         return tuple(score), keep, may_try_evolve, may_try_upgrade, may_buddy, may_favor
 
     def satisfy_requirements(self, pokemon, req):
-        if type(req) is bool:
+        if type(req) == bool:
             return req
 
         satisfy = True
@@ -491,11 +491,11 @@ class PokemonOptimizer(BaseTask):
         for a, v in req.items():
             value = getattr(pokemon, a, 0)
 
-            if (type(v) is str) or (type(v) is unicode):
+            if (type(v) == str) or (type(v) == str):
                 v = float(v)
 
-            if type(v) is list:
-                if type(v[0]) is list:
+            if type(v) == list:
+                if type(v[0]) == list:
                     satisfy_range = False
 
                     for r in v:
@@ -590,10 +590,10 @@ class PokemonOptimizer(BaseTask):
 
     def get_better_pokemon(self, pokemon_list, worst, limit=1000):
         keep = [p for p in pokemon_list if p.__score__[0] >= worst.__score__[0]][:limit]
-        try_evolve = [p for p in keep if p.__score__[2] is True]
-        try_upgrade = [p for p in keep if (p.__score__[2] is False) and (p.__score__[3] is True)]
-        buddy = [p for p in keep if p.__score__[4] is True]
-        favor = [p for p in keep if p.__score__[5] is True]
+        try_evolve = [p for p in keep if p.__score__[2] == True]
+        try_upgrade = [p for p in keep if (p.__score__[2] == False) and (p.__score__[3] == True)]
+        buddy = [p for p in keep if p.__score__[4] == True]
+        favor = [p for p in keep if p.__score__[5] == True]
 
         return keep, try_evolve, try_upgrade, buddy, favor
 
@@ -615,7 +615,7 @@ class PokemonOptimizer(BaseTask):
         for pokemon in try_evolve:
             pokemon_id = pokemon.pokemon_id
             needed_evolution_item = inventory.pokemons().evolution_item_for(pokemon_id)
-            if needed_evolution_item is not None:
+            if needed_evolution_item != None:
                 if self.config_use_evolution_items:
                     # We need a special Item to evolve this Pokemon!
                     item = inventory.items().get(needed_evolution_item)
@@ -910,7 +910,7 @@ class PokemonOptimizer(BaseTask):
 
         if self.config_evolve and (not self.bot.config.test):
             needed_evolution_item = inventory.pokemons().evolution_item_for(pokemon.pokemon_id)
-            if needed_evolution_item is not None:
+            if needed_evolution_item != None:
                 if self.config_use_evolution_items:
                     # We need evolution_item_requirement with some!!
                     request = self.bot.api.create_request()
@@ -1115,7 +1115,7 @@ class PokemonOptimizer(BaseTask):
         sleep(1.2)  # wait a bit after request
         if response_dict:
             result = response_dict.get('responses', {}).get('SET_FAVORITE_POKEMON', {}).get('result', 0)
-            if result is 1:  # Request success
+            if result == 1:  # Request success
                 action_delay(self.config_action_wait_min, self.config_action_wait_max)
                 # Mark Pokemon as favorite
                 pokemon.is_favorite = True
@@ -1138,7 +1138,7 @@ class PokemonOptimizer(BaseTask):
         sleep(1.2)  # wait a bit after request
         if response_dict:
             result = response_dict.get('responses', {}).get('SET_FAVORITE_POKEMON', {}).get('result', 0)
-            if result is 1:  # Request success
+            if result == 1:  # Request success
                 # Mark Pokemon as no longer favorite
                 pokemon.is_favorite = False
                 self.emit_event("pokemon_unfavored",
