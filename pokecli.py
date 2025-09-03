@@ -94,7 +94,7 @@ def main():
         yes = set(['yes','y', 'ye', ''])
         no = set(['no','n'])
         print(question)
-        choice = raw_input().lower()
+        choice = input().lower()
         if choice in yes:
             return True
         elif choice in no:
