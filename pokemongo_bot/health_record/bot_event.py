@@ -2,6 +2,7 @@
 
 import logging
 from sentry_sdk import init, capture_exception
+from sentry_sdk.transport import HttpTransport  # Add this import
 import uuid
 import requests
 import time
@@ -21,6 +22,7 @@ class BotEvent(object):
             init(
                 dsn='https://8abac56480f34b998813d831de262514:196ae1d8dced41099f8253ea2c8fe8e6@app.getsentry.com/90254',
                 environment='PokemonGoF-Bot',
+                transport=HttpTransport,  # Use synchronous transport
                 processors=(
                     'sentry_sdk.integrations.stdlib.SanitizePasswordsProcessor',
                     'sentry_sdk.integrations.stdlib.RemoveStackLocalsProcessor'
