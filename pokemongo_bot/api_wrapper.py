@@ -54,32 +54,15 @@ class ApiWrapper(PGoApi, object):
         self.useVanillaRequest = False
 
     def gen_device_id(self):
-        if self.config is None or self.config.username is None:
-            ApiWrapper.DEVICE_ID = "3d65919ca1c2fc3a8e2bd7cc3f974c34"
-            return
-        file_salt = None
-        did_path = os.path.join(_base_dir, 'data', 'deviceid-%s.txt' % self.config.username)
-        if os.path.exists(did_path):
-            file_salt = open(did_path, 'r').read()
-        if self.config is not None:
-            key_string = self.config.username
-            if file_salt is not None:
-                # Config and file are set, so use those.
-                ApiWrapper.DEVICE_ID = hashlib.md5(key_string + file_salt).hexdigest()[:32]
-            else:
-                # Config is set, but file isn't, so make it.
-                rand_float = random.SystemRandom().random()
-                salt = base64.b64encode((struct.pack('!d', rand_float)))
-                ApiWrapper.DEVICE_ID = hashlib.md5(key_string + salt).hexdigest()[:32]
-                with open(did_path, "w") as text_file:
-                    text_file.write("{0}".format(salt))
+        key_string = self.config.device_id or self.config.username
+        if isinstance(key_string, str):
+            key_string = key_string.encode('utf-8')  # Convert str to bytes
+        elif isinstance(key_string, bytes):
+            pass  # Already bytes
         else:
-            if file_salt is not None:
-                # No config, but there's a file, use it.
-                ApiWrapper.DEVICE_ID = hashlib.md5(file_salt).hexdigest()[:32]
-            else:
-                # No config or file, so make up a reasonable default.
-                ApiWrapper.DEVICE_ID = "3d65919ca1c2fc3a8e2bd7cc3f974c34"
+            raise ValueError(f"Invalid key_string type: {type(key_string)}")
+        salt = os.urandom(8)  # Already bytes
+        ApiWrapper.DEVICE_ID = hashlib.md5(key_string + salt).hexdigest()[:32]
 
     def create_request(self):
         RequestClass = ApiRequest
