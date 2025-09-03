@@ -11,6 +11,21 @@ import os
 
 from pokemongo_bot.base_dir import _base_dir
 
+def ensure_json_serializable(obj):
+    """Recursively convert non-JSON-serializable objects to serializable types."""
+    if isinstance(obj, bytes):
+        return obj.decode('utf-8', errors='replace')
+    elif isinstance(obj, dict):
+        return {k: ensure_json_serializable(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [ensure_json_serializable(item) for item in list(obj)]
+    elif isinstance(obj, tuple):
+        return tuple(ensure_json_serializable(item) for item in obj)
+    elif isinstance(obj, set):
+        return [ensure_json_serializable(item) for item in list(obj)]
+    elif hasattr(obj, '__dict__'):
+        return ensure_json_serializable(obj.__dict__)
+    return obj
 
 class FileIOException(Exception):
     pass
@@ -45,27 +60,20 @@ class Event(object):
         """
         t = datetime.today()
         self.timestamp = t.strftime('%Y-%m-%d %H:%M:%S')
-        self.event = str(event).encode('ascii', 'xmlcharrefreplace')
-        if sender==None:
-            self.sender = sender
-        else:
-            self.sender = str(sender).encode('ascii', 'xmlcharrefreplace')
-        
-        self.level = str(level).encode('ascii', 'xmlcharrefreplace')
-
-        #Fixing issue 6123 for gym names that are in utf format.
+        self.event = str(event)  # Keep as str
+        self.sender = str(sender) if sender is not None else None  # Keep as str or None
+        self.level = str(level)  # Keep as str
         try:
-            self.formatted = str(formatted).encode('ascii', 'xmlcharrefreplace')
+            self.formatted = str(formatted)  # Keep as str
         except UnicodeEncodeError:
-            self.formatted = str(unicode(formatted).encode('unicode_escape'))
-        
-        self.data = str(data).encode('ascii', 'xmlcharrefreplace')
+            self.formatted = str(formatted.encode('unicode_escape').decode('ascii'))
+        self.data = data  # Keep data as-is (handle serialization later)
         self.friendly_msg = ""
         
         if not formatted:
-            self.friendly_msg = self.data 
+            self.friendly_msg = str(self.data)
         else:
-            #Format the data
+            # Format the data
             self.friendly_msg = formatted.format(**data)
             
     def __str__(self):
@@ -130,20 +138,30 @@ class Events(object):
             self.init_event_outfile()
 
         json_events = self.jsonify_events()
-        #self.bot.logger.info('####### Writing %s' % json_events)
+        # self.bot.logger.info('####### Writing %s' % json_events)
 
         try:
             with open(web_event, "w") as outfile:
-                json.dump(json_events, outfile)
+                json.dump(json_events, outfile, ensure_ascii=False)
         except (IOError, ValueError) as e:
             self.bot.logger.info('[x] Error while opening events file for write: %s' % e, 'red')
-        except:
-            raise FileIOException("Unexpected error writing to {}".web_event)
+        except Exception as e:
+            self.bot.logger.info('[x] Error while writing to events file: %s' % e, 'red')
+            raise FileIOException("Unexpected error writing to {}".format(web_event))
 
     def jsonify_events(self):
         json_events = []
         for event in self._events:
-            json_events.append({"event": {"timestamp": event.timestamp, "friendly_msg": event.friendly_msg, "event": event.event, "level": event.level, "formatted": event.formatted, "data": event.data}})
+            json_events.append({
+                "event": {
+                    "timestamp": event.timestamp,
+                    "friendly_msg": event.friendly_msg,
+                    "event": event.event,
+                    "level": event.level,
+                    "formatted": event.formatted,
+                    "data": ensure_json_serializable(event.data)
+                }
+            })
         return json_events
         
         

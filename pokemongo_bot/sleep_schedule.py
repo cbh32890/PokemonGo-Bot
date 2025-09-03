@@ -96,18 +96,18 @@ class SleepSchedule(object):
             if hasattr(self.bot, 'api'): self.bot.login() # Same here
 
     def _time_fmt(self, value):
-       ret = ""
-       if isinstance(value, datetime):
-           ret = value.strftime("%H:%M:%S")
-       elif isinstance(value, (int, float)):
-           h, m = divmod(value, 3600)
-           m, s = divmod(m, 60)
-           ret = "%02d:%02d:%02d" % (h, m, s)
-       return ret
-
+        ret = ""
+        if isinstance(value, bytes):
+            value = value.decode('utf-8', errors='replace')  # Convert bytes to str
+        if isinstance(value, datetime):
+            ret = value.strftime("%H:%M:%S")
+        elif isinstance(value, (int, float)):
+            h, m = divmod(value, 3600)
+            m, s = divmod(m, 60)
+            ret = "%02d:%02d:%02d" % (h, m, s)
+        return ret
 
     def _process_config(self, config):
-
         def testkey(entry, key, offset=False, defval=''):
             if not key in entry:
                 index = config.index(entry) + 1
@@ -136,26 +136,31 @@ class SleepSchedule(object):
             prepared = {}
 
             testkey(entry, 'time')
-            prepared['time'] = datetime.strptime(entry['time'], '%H:%M')
+            time_str = str(entry['time']) if isinstance(entry['time'], bytes) else entry['time']
+            prepared['time'] = datetime.strptime(time_str, '%H:%M')
 
             testkey(entry, 'duration')
-            raw_duration = datetime.strptime(entry['duration'], '%H:%M')
+            duration_str = str(entry['duration']) if isinstance(entry['duration'], bytes) else entry['duration']
+            raw_duration = datetime.strptime(duration_str, '%H:%M')
             duration = int(timedelta(hours=raw_duration.hour, minutes=raw_duration.minute).total_seconds())
 
             testkey(entry, 'time_random_offset', offset=True, defval='01:00')
-            raw_time_random_offset = datetime.strptime(entry['time_random_offset'] if 'time_random_offset' in entry else '01:00', '%H:%M')
+            time_offset_str = str(entry['time_random_offset'] if 'time_random_offset' in entry else '01:00')
+            raw_time_random_offset = datetime.strptime(time_offset_str, '%H:%M')
             time_random_offset = int(
                 timedelta(
                     hours=raw_time_random_offset.hour, minutes=raw_time_random_offset.minute).total_seconds())
 
             testkey(entry, 'duration_random_offset', offset=True, defval='00:30')
-            raw_duration_random_offset = datetime.strptime(entry['duration_random_offset'] if 'duration_random_offset' in entry else '00:30', '%H:%M')
+            duration_offset_str = str(entry['duration_random_offset'] if 'duration_random_offset' in entry else '00:30')
+            raw_duration_random_offset = datetime.strptime(duration_offset_str, '%H:%M')
             duration_random_offset = int(
                 timedelta(
                     hours=raw_duration_random_offset.hour, minutes=raw_duration_random_offset.minute).total_seconds())
 
             raw_wake_up_at_location = entry['wake_up_at_location'] if 'wake_up_at_location' in entry else None
             if raw_wake_up_at_location:
+                raw_wake_up_at_location = str(raw_wake_up_at_location) if isinstance(raw_wake_up_at_location, bytes) else raw_wake_up_at_location
                 try:
                     wake_up_at_location = self.bot.get_pos_by_name(raw_wake_up_at_location)
                     lat = float(wake_up_at_location[0])
@@ -164,7 +169,7 @@ class SleepSchedule(object):
                     prepared['wake_up_at_location'] = { 'raw': raw_wake_up_at_location, 'coord': (lat, lng, alt) }
                 except:
                     index = config.index(entry)
-                    self.bot.warning('SleepSchedule: error parsing wake_up_at_location in entry %d' % index)
+                    self.bot.logger.warning('SleepSchedule: error parsing wake_up_at_location in entry %d' % index)
 
             prepared['duration'] = duration
             prepared['time_random_offset'] = time_random_offset
@@ -179,13 +184,15 @@ class SleepSchedule(object):
         self._next_sleep, self._next_duration, self._next_end, self._wake_up_at_location, sleep_now = self._get_next_sleep_schedule()
 
         if not sleep_now:
+            time_str = str(self._time_fmt(self._next_sleep))  # Ensure str
+            duration_str = str(self._time_fmt(self._next_duration))  # Ensure str
             self.bot.event_manager.emit(
                 'next_sleep',
                 sender=self,
                 formatted="Next sleep at {time}, for a duration of {duration}",
                 data={
-                    'time': self._time_fmt(self._next_sleep),
-                    'duration': self._time_fmt(self._next_duration)
+                    'time': time_str,
+                    'duration': duration_str
                 }
             )
             if self._enable_reminder: self._last_reminder = datetime.now()
@@ -201,14 +208,16 @@ class SleepSchedule(object):
 
         if self._enable_reminder:
             diff = now - self._last_reminder
-            if (diff.total_seconds() >= self._reminder_interval):
+            if diff.total_seconds() >= self._reminder_interval:
+                time_str = str(self._next_sleep.strftime("%H:%M:%S"))  # Ensure str
+                duration_str = str(timedelta(seconds=self._next_duration))  # Ensure str
                 self.bot.event_manager.emit(
                     'next_sleep',
                     sender=self,
                     formatted="Next sleep at {time}, for a duration of {duration}",
                     data={
-                        'time': str(self._next_sleep.strftime("%H:%M:%S")),
-                        'duration': str(timedelta(seconds=self._next_duration))
+                        'time': time_str,
+                        'duration': duration_str
                     }
                 )
                 self._last_reminder = now
