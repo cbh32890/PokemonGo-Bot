@@ -105,7 +105,7 @@ class UpdateLiveInventory(BaseTask):
         :return: True if the stats should be displayed; otherwise, False.
         :rtype: bool
         """
-        return self.next_update is None or datetime.now() >= self.next_update
+        return self.next_update == None or datetime.now() >= self.next_update
 
     def compute_next_update(self):
         """

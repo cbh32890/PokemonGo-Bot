@@ -31,7 +31,7 @@ class FollowCluster(BaseTask):
         else:
             self.dest = find_biggest_cluster(self.radius, forts)
 
-        if self.dest is not None:
+        if self.dest != None:
             lat = self.dest['latitude']
             lng = self.dest['longitude']
             cnt = self.dest['num_points']

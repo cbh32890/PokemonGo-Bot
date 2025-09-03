@@ -165,7 +165,7 @@ class IncubateEggs(BaseTask):
                             "km_needed": (km_walked - start_km)
                         })
                     else:
-                        if incubator.get('uses_remaining') is not None:
+                        if incubator.get('uses_remaining') != None:
                             if incubator.get('item_id') == 902:
                                 temp_ready_breakable_incubators.append({
                                     "id": incubator.get('id', -1)
@@ -297,7 +297,7 @@ class IncubateEggs(BaseTask):
         :return: True if the stats should be displayed; otherwise, False.
         :rtype: bool
         """
-        return self.next_update is None or datetime.now() >= self.next_update
+        return self.next_update == None or datetime.now() >= self.next_update
 
     def _compute_next_update(self):
         """

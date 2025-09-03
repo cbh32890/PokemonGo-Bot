@@ -180,7 +180,7 @@ class UpdateLiveStats(BaseTask):
         """
         if not self.terminal_title and not self.terminal_log or not self.displayed_stats:
             return False
-        return self.next_update is None or datetime.now() >= self.next_update
+        return self.next_update == None or datetime.now() >= self.next_update
 
     def _compute_next_update(self):
         """
@@ -335,7 +335,7 @@ class UpdateLiveStats(BaseTask):
         :rtype: string
         """
         # No player stats available, won't be able to gather all informations.
-        if player_stats is None:
+        if player_stats == None:
             return ''
 
         # Create stats strings.

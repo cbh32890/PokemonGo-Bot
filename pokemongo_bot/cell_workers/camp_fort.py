@@ -91,8 +91,8 @@ class CampFort(BaseTask):
 
         forts = self.get_forts()
 
-        if self.cluster is None:
-            if self.clusters is None:
+        if self.cluster == None:
+            if self.clusters == None:
                 self.clusters = self.get_clusters(forts.values())
             # self.logger.info("Forts: {}".format(len(forts)))
             # self.logger.info("Checking {} clusters for availiblity....".format(len(self.clusters)))
@@ -117,7 +117,7 @@ class CampFort(BaseTask):
             self.clusters = self.get_clusters(forts.values())
             available_clusters = self.get_available_clusters(forts)
             if len(available_clusters) > 0:
-                if self.cluster is not available_clusters[0]:
+                if self.cluster != available_clusters[0]:
                     self.cluster = available_clusters[0]
                     self.stay_until = 0
                     self.emit_event("new_destination",
@@ -270,7 +270,7 @@ class CampFort(BaseTask):
                    "distance": 0,
                    "forts": forts_in_circle,
                    "size": len(forts_in_circle),
-                   "lured": sum(1 for f in forts_in_circle if f.get("active_fort_modifier", None) is not None)}
+                   "lured": sum(1 for f in forts_in_circle if f.get("active_fort_modifier", None) != None)}
 
         return cluster
 
@@ -281,7 +281,7 @@ class CampFort(BaseTask):
         cluster["distance"] = great_circle(self.bot.position, cluster["center"]).meters
 
     def update_cluster_lured(self, cluster, forts):
-        cluster["lured"] = sum(1 for f in cluster["forts"] if forts.get(f["id"], {}).get("active_fort_modifier", None) is not None)
+        cluster["lured"] = sum(1 for f in cluster["forts"] if forts.get(f["id"], {}).get("active_fort_modifier", None) != None)
 
     def get_distance(self, location, fort):
         return great_circle(location, (fort["latitude"], fort["longitude"])).meters

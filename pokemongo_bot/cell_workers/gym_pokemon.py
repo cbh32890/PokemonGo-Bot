@@ -145,7 +145,7 @@ class GymPokemon(BaseTask):
 
         if self.bot.catch_disabled and self.can_be_disabled_by_catch_limter:
             # When catching is disabled, drop the target.
-            if self.destination is not None:
+            if self.destination != None:
                 self.destination = None
 
             if not hasattr(self.bot, "gym_pokemon_disabled_global_warning") or \
@@ -181,13 +181,13 @@ class GymPokemon(BaseTask):
         if not self.should_run():
             return WorkerResult.SUCCESS
             
-        if self.destination is None:
+        if self.destination == None:
             self.check_close_gym()
 
-        if self.destination is None:
+        if self.destination == None:
             self.determin_new_destination()
 
-        if self.destination is not None:
+        if self.destination != None:
             result = self.move_to_destination()
             # Can return RUNNING to move to a gym
             return result
@@ -197,7 +197,7 @@ class GymPokemon(BaseTask):
             # Can return RUNNING to move to a gym
             #return result
 
-        if hasattr(self.bot, "hunter_locked_target") and self.bot.hunter_locked_target is not None:
+        if hasattr(self.bot, "hunter_locked_target") and self.bot.hunter_locked_target != None:
             # Don't move to a gym when hunting for a Pokemon
             return WorkerResult.SUCCESS
 
@@ -259,14 +259,14 @@ class GymPokemon(BaseTask):
                                     if display['slots_available'] > 0 and gym["id"] not in self.dropped_gyms:
                                         self.logger.info("Dropping pokemon in %s" % gym_details["name"])
                                         self.drop_pokemon_in_gym(gym, pokes)
-                                        if self.destination is not None and gym["id"] == self.destination["id"]:
+                                        if self.destination != None and gym["id"] == self.destination["id"]:
                                             self.destination = None
                                         return WorkerResult.SUCCESS
                     else:
                         self.logger.info("Neutral gym? %s" % gym)
                         self.logger.info("Dropping pokemon in %s" % gym_details["name"])
                         self.drop_pokemon_in_gym(gym, [])
-                        if self.destination is not None and gym["id"] == self.destination["id"]:
+                        if self.destination != None and gym["id"] == self.destination["id"]:
                             self.destination = None
                         return WorkerResult.SUCCESS
 
@@ -329,7 +329,7 @@ class GymPokemon(BaseTask):
         
         self.found_raid = False
         pokemon_in_raid = None
-        if self.raid and (self.free_raid_tickets > 0 or self.paid_raid_tickets > 0) and self.destination is None: # Only check for raid if it's not slotting pokemons 
+        if self.raid and (self.free_raid_tickets > 0 or self.paid_raid_tickets > 0) and self.destination == None: # Only check for raid if it's not slotting pokemons 
             self.logger.info("Checking for eligable raids")
             self.recent_gyms = []
             gyms = self.get_gyms(get_raids=True)
@@ -387,7 +387,7 @@ class GymPokemon(BaseTask):
             for g in gyms:
                 if g["id"] == self.destination["id"]:
                     # self.logger.info("Inspecting target: %s" % g)
-                    if "owned_by_team" in g and g["owned_by_team"] is not self.team:
+                    if "owned_by_team" in g and g["owned_by_team"] != self.team:
                         self.logger.info("Damn! Team %s took gym before we arrived!" % TEAMS[g["owned_by_team"]])
                         self.destination = None
                         return WorkerResult.SUCCESS
@@ -460,7 +460,7 @@ class GymPokemon(BaseTask):
                     # Look around if there are more gyms to fill
                     self.determin_new_destination()
                     # If there is none, we're done, else we go to the next!
-                    if self.destination is None:
+                    if self.destination == None:
                         return WorkerResult.SUCCESS
                     else:
                         return WorkerResult.RUNNING
@@ -476,7 +476,7 @@ class GymPokemon(BaseTask):
                 # successful raid, go to bonus capture
                 # reset raid, return success
                 gym_info = gym_details.get('gym_status_and_defenders', None)
-                if gym_info is not None:
+                if gym_info != None:
                     pokemon_fort_proto = gym_info.get('pokemon_fort_proto')
                     raid_info = pokemon_fort_proto.get('raid_info')
                     raid_level = raid_info['raid_level']
@@ -594,7 +594,7 @@ class GymPokemon(BaseTask):
             if g["id"] == gym["id"]:
                 if 'owned_by_team' in g:
                     self.logger.info("Expecting team: %s it is: %s" % (self.bot.player_data['team'], g["owned_by_team"]) )
-                    if g["owned_by_team"] is not self.team:
+                    if g["owned_by_team"] != self.team:
                         self.logger.info("Can't drop in a enemy gym!")
                         self.recent_gyms.append(gym["id"])
                         return WorkerResult.SUCCESS
@@ -812,10 +812,10 @@ class GymPokemon(BaseTask):
         return gyms
 
     def _should_print(self):
-        return self.next_update is None or datetime.now() >= self.next_update
+        return self.next_update == None or datetime.now() >= self.next_update
 
     def _should_expire(self):
-        return self.next_expire is None or datetime.now() >= self.next_expire
+        return self.next_expire == None or datetime.now() >= self.next_expire
 
     def _compute_next_expire(self):
         self.next_expire = datetime.now() + timedelta(seconds=300)
@@ -825,7 +825,7 @@ class GymPokemon(BaseTask):
         self.recheck = datetime.now() + timedelta(seconds=wait)
 
     def _should_recheck(self):
-        return self.recheck is None or datetime.now() >= self.recheck
+        return self.recheck == None or datetime.now() >= self.recheck
 
     def _compute_next_update(self):
         """

@@ -67,7 +67,7 @@ class FollowPath(BaseTask):
         self.number_lap = 0
 
     def load_path(self):
-        if self.path_file is None:
+        if self.path_file == None:
             raise RuntimeError('You need to specify a path file (json or gpx)')
 
         if self.path_file.endswith('.json'):

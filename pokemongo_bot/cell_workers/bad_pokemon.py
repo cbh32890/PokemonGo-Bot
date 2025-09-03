@@ -35,7 +35,7 @@ class BadPokemon(BaseTask):
     return WorkerResult.SUCCESS
 
   def _should_print(self):
-    return self.next_update is None or datetime.now() >= self.next_update
+    return self.next_update == None or datetime.now() >= self.next_update
 
   def _compute_next_update(self):
     self.next_update = datetime.now() + timedelta(seconds=self.min_interval)

@@ -42,12 +42,12 @@ class MoveToFort(BaseTask):
         if not self.should_run():
             return WorkerResult.SUCCESS
 
-        if hasattr(self.bot, "hunter_locked_target") and self.bot.hunter_locked_target is not None:
+        if hasattr(self.bot, "hunter_locked_target") and self.bot.hunter_locked_target != None:
             return WorkerResult.SUCCESS
 
         nearest_fort = self.get_nearest_fort()
 
-        if nearest_fort is None:
+        if nearest_fort == None:
             return WorkerResult.SUCCESS
 
         lat = nearest_fort['latitude']
@@ -56,7 +56,7 @@ class MoveToFort(BaseTask):
         details = fort_details(self.bot, fortID, lat, lng)
         fort_name = details.get('name', 'Unknown')
 
-        if self.target_id is None:
+        if self.target_id == None:
             self.target_id = fort_name
 
         unit = self.bot.config.distance_unit  # Unit to use when printing formatted distance
@@ -80,11 +80,11 @@ class MoveToFort(BaseTask):
 
         if len(self.previous_distance) == 0:
             self.previous_distance.append(distance_to_target)
-        elif self.target_id is not fort_name:
+        elif self.target_id != fort_name:
             # self.logger.info("Changed target from %s to %s" % (self.target_id, fort_name))
             self.previous_distance = [distance_to_target]
             self.target_id = fort_name
-            if self.walker is not self.config.get('walker', 'StepWalker'):
+            if self.walker != self.config.get('walker', 'StepWalker'):
                 self.walker = self.config.get('walker', 'StepWalker')
         else:
             if len(self.previous_distance) < 10:

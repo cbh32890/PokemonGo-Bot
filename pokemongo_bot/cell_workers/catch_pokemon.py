@@ -103,7 +103,7 @@ class CatchPokemon(BaseTask):
                             family_catch = True
 
                 if not family_catch and not trash_catch:
-                    if (mon_name != bounty_name and is_vip is False):
+                    if (mon_name != bounty_name and is_vip == False):
                         # This is not the Pokémon you are looking for...
                         self.logger.info("[Hunter locked a {}] Ignoring a {}".format(bounty_name, mon_name))
                         self.ignored_while_looking.append(mon_to_catch['pokemon_id'])

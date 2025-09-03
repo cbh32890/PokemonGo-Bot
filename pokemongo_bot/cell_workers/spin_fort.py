@@ -167,7 +167,7 @@ class SpinFort(BaseTask):
                 if raid_tickets_int:
                     raid_tickets = inventory.Items.name_for(1401)
                     
-                if egg_awarded is not None:
+                if egg_awarded != None:
                     items_awarded[u'Egg'] = egg_awarded['egg_km_walked_target']
 
                 # if gym_badge_awarded is not None:
@@ -178,9 +178,9 @@ class SpinFort(BaseTask):
 
                 if experience_awarded or items_awarded:
                     awards = ', '.join(["{}x {}".format(items_awarded[x], x) for x in items_awarded if x != u'Egg'])
-                    if egg_awarded is not None:
+                    if egg_awarded != None:
                         awards += u', {} Egg'.format(egg_awarded['egg_km_walked_target'])     
-                    if raid_tickets is not None:
+                    if raid_tickets != None:
                         awards += u', {}'.format(raid_tickets)
                         
                     self.fort_spins = chain_hack_sequence_number

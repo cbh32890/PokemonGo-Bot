@@ -85,7 +85,7 @@ class BuddyPokemon(BaseTask):
         self._check_old_reward()
 
     def _validate_config(self):
-        if isinstance(self.buddy_list, basestring):
+        if isinstance(self.buddy_list, str):
             self.buddy_list = [str(pokemon_name).lower().strip()
                                for pokemon_name in self.buddy_list.split(',')]
         if self.buddy_list and self.buddy_list[0] == 'none':
@@ -106,13 +106,13 @@ class BuddyPokemon(BaseTask):
 
         if self.buddy_list:
             pokemon = self._get_pokemon_by_name(self._get_pokemon_by_id(self.buddy['id']).name) if 'id' in self.buddy else None
-            if self.force_first_change or not self.buddy or pokemon is None or (self.candy_limit != 0 and self.candy_awarded >= self.candy_limit) or self._check_candy_limit_absolute(pokemon):
+            if self.force_first_change or not self.buddy or pokemon == None or (self.candy_limit != 0 and self.candy_awarded >= self.candy_limit) or self._check_candy_limit_absolute(pokemon):
                 self.force_first_change = False
 
                 remaining = []
                 for name in self.buddy_list:
                     pokemon = self._get_pokemon_by_name(name)
-                    if name not in self.cache and pokemon is not None and not self._check_candy_limit_absolute(pokemon):
+                    if name not in self.cache and pokemon != None and not self._check_candy_limit_absolute(pokemon):
                         remaining.append(name)
 
                 if not remaining:
@@ -123,7 +123,7 @@ class BuddyPokemon(BaseTask):
                 self.cache.append(poke_name)
 
                 pokemon = self._get_pokemon_by_name(poke_name)
-                if pokemon is None:
+                if pokemon == None:
                     return WorkerResult.ERROR
 
                 if not self.buddy or pokemon.name != self._get_pokemon_by_id(self.buddy['id']).name:
@@ -248,7 +248,7 @@ class BuddyPokemon(BaseTask):
                 pokemon = p
                 break
 
-        if pokemon is None:
+        if pokemon == None:
             self.emit_event(
                 'buddy_not_available',
                 formatted='{name} was not found',
@@ -274,7 +274,7 @@ class BuddyPokemon(BaseTask):
                 return pokemon
 
     def _should_print(self):
-        return self.next_update is None or datetime.now() >= self.next_update
+        return self.next_update == None or datetime.now() >= self.next_update
 
     def _compute_next_update(self):
         self.next_update = datetime.now() + timedelta(seconds=self.min_interval)

@@ -90,7 +90,7 @@ class CatchLimiter(BaseTask):
                 self.bot.catch_resume_at = now
             self.bot.warned_about_catch_limit = False
 
-        elif self.bot.catch_resume_at is not None and self.bot.catch_limit_reached:
+        elif self.bot.catch_resume_at != None and self.bot.catch_limit_reached:
             # Lets check if the resume time has passed and the limit is okay
             if now >= self.bot.catch_resume_at and result[0] < self.daily_catch_limit:
                 self.emit_event(
@@ -126,7 +126,7 @@ class CatchLimiter(BaseTask):
         # If balls_on_hand is more than resume_at_balls,
         # resume catch tasks, if not softbanned
         if (
-                self.bot.softban is False and
+                self.bot.softban == False and
                 self.bot.catch_disabled and
                 balls_on_hand >= self.resume_at_balls
         ):
