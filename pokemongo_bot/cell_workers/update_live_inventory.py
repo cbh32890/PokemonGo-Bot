@@ -203,7 +203,7 @@ class UpdateLiveInventory(BaseTask):
 
         if is_debug:
             temp = []
-            for key, value in available_items.iteritems():
+            for key, value in available_items.items():
                 temp.append(value)
             return ' | '.join(temp)
 

@@ -162,7 +162,7 @@ class EventManager(object):
         
         
     def event_report(self):
-        for event, parameters in self._registered_events.iteritems():
+        for event, parameters in self._registered_events.items():
             print('-'*80)
             print('Event: {}'.format(event))
             if parameters:
@@ -198,7 +198,7 @@ class EventManager(object):
         # verify params match event
         parameters = self._registered_events[event]
         if parameters:
-            for k, v in data.iteritems():
+            for k, v in data.items():
                 if k not in parameters:
                     raise EventMalformedException("Event %s does not require parameter %s" % (event, k))
 

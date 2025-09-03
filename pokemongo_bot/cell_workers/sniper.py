@@ -44,7 +44,7 @@ class SniperSource(object):
         # If results is STILL a dict (eg. each pokemon is its own dict), need to build data from nested json (example whereispokemon.net)
         while isinstance(results,dict):
             tmpResults = []
-            for key, value in results.iteritems():
+            for key, value in results.items():
                 tmpResults.append(value)
                 results = tmpResults
 

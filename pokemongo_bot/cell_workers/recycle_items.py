@@ -125,7 +125,7 @@ class RecycleItems(BaseTask):
         :raise: ConfigException: When an item doesn't exist in ../../data/items.json
         """
         item_list = json.load(open(os.path.join(_base_dir, 'data', 'items.json')))
-        for config_item_name, bag_count in self.items_filter.iteritems():
+        for config_item_name, bag_count in self.items_filter.items():
             if config_item_name not in item_list.viewvalues():
                 if config_item_name not in item_list:
                     raise ConfigException(

@@ -1574,7 +1574,7 @@ class PokemonGoBot(object):
         # Remove forts that we can now spin again.
         now = time.time()
         self.fort_timeouts = {id: timeout for id, timeout
-                              in self.fort_timeouts.iteritems()
+                              in self.fort_timeouts.items()
                               if timeout >= now * 1000}
 
         if now - self.last_heartbeat >= self.heartbeat_threshold and not self.hb_locked:

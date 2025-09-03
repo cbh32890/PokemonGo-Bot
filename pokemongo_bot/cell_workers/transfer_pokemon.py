@@ -27,7 +27,7 @@ class TransferPokemon(BaseTask):
             return
 
         pokemon_groups = self._release_pokemon_get_groups()
-        for pokemon_id, group in pokemon_groups.iteritems():
+        for pokemon_id, group in pokemon_groups.items():
             pokemon_name = Pokemons.name_for(pokemon_id)
             self._release_pokemon_worst_in_group(group, pokemon_name)
 
