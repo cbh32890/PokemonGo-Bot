@@ -201,7 +201,9 @@ def main():
         bot.start(bot)
         initialize_task(bot, config)
         bot.metrics.capture_stats()
-        bot.health_record = BotEvent(config)
+        # convert namespace to dict if needed
+        config_dict = vars(config) if isinstance(config, Namespace) else config
+        bot.health_record = BotEvent(config_dict)
         return bot
 
     def get_commit_hash():
