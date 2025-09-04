@@ -4,6 +4,7 @@ import logging
 import random, base64, struct
 import hashlib
 import os
+import uuid
 import urllib
 import sys
 from pgoapi.exceptions import (ServerSideRequestThrottlingException,
@@ -54,11 +55,13 @@ class ApiWrapper(PGoApi, object):
         self.useVanillaRequest = False
 
     def gen_device_id(self):
-        key_string = self.config.device_id or self.config.username
+        key_string = getattr(self.config, 'device_id', self.config.username)  # Fallback to username
+        if not key_string:  # If username is also missing, generate a new ID
+            key_string = str(uuid.uuid4())
         if isinstance(key_string, str):
             key_string = key_string.encode('utf-8')  # Convert str to bytes
         elif isinstance(key_string, bytes):
-            pass  # Already bytes
+            pass
         else:
             raise ValueError(f"Invalid key_string type: {type(key_string)}")
         salt = os.urandom(8)  # Already bytes
@@ -90,6 +93,8 @@ class ApiWrapper(PGoApi, object):
         timezone = "America/Chicago"
         geolocator = GoogleV3(api_key=self.config.gmapkey)
         
+        print("I'm here")
+
         if self.config.locale_by_location:
             try:
                 location = geolocator.reverse((self.actual_lat, self.actual_lng), timeout = 10, exactly_one=True)
