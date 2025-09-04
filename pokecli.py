@@ -438,113 +438,12 @@ def report_summary(bot):
         else:
             logger.warning(f"No config file found at {config_file}, proceeding with auth only")
 
-        # Define command-line arguments
+        # Parse command-line arguments
         parser.add_argument("-cf", "--config", help="Config File to use")
         parser.add_argument("-af", "--auth", help="Auth File to use")
-        parser.add_argument("-a", "--auth_service", help="Auth Service (ptc or google)", default=load.get('auth_service'))
-        parser.add_argument("-u", "--username", help="Username", default=load.get('username'))
-        parser.add_argument("-p", "--password", help="Password", default=load.get('password'))
-        parser.add_argument("-l", "--location", help="Location", default=load.get('location'))
-        # Add other arguments as needed
-        parser.add_argument("-lc", "--location_cache", help="Location Cache", action='store_true', default=load.get('location_cache', False))
-        parser.add_argument("-d", "--debug", help="Debug Mode", action='store_true', default=load.get('debug', False))
-        parser.add_argument("-t", "--test", help="Test Mode", action='store_true', default=load.get('test', False))
-
-        config = parser.parse_args()
+        config = parser.parse_args([], namespace=argparse.Namespace(**load))
         config_file = config.config or config_file
-
-        if not config.auth_service:
-            logger.error("No auth_service specified in auth.json or via -a/--auth_service")
-            parser.error("the following arguments are required: -a/--auth_service")
-            return None
-
-        # Continue with the rest of the original init_config logic
-        config.favorite_locations = load.get('favorite_locations', [])
-        config.telegram_token = load.get('telegram_token', '')
-        config.discord_token = load.get('discord_token', '')
-        config.twocaptcha_token = load.get('2captcha_token', '')
-        config.catch = load.get('catch', {})
-        config.release = load.get('release', {})
-        config.plugins = load.get('plugins', [])
-        config.raw_tasks = load.get('tasks', [])
-        config.vips = load.get('vips', {})
-        config.sleep_schedule = load.get('sleep_schedule', {})
-        config.live_config_update = load.get('live_config_update', {})
-        config.live_config_update_enabled = config.live_config_update.get('enabled', False)
-        config.live_config_update_tasks_only = config.live_config_update.get('tasks_only', False)
-        config.logging = load.get('logging', {})
-
-        if config.map_object_cache_time < 0.0:
-            parser.error("--map_object_cache_time is out of range! (should be >= 0.0)")
-            return None
-
-        if len(config.raw_tasks) == 0:
-            logger.error("No tasks are configured. Did you mean to configure some behaviors? Read https://github.com/PokemonGoF/PokemonGo-Bot/wiki/Configuration-files#configuring-tasks for more information")
-            return None
-
-        if config.auth_service not in ['ptc', 'google']:
-            logger.error("Invalid Auth service specified! ('ptc' or 'google')")
-            return None
-
-        def task_configuration_error(flag_name):
-            parser.error("""
-                \"{}\" was removed from the configuration options.
-                You can now change the behavior of the bot by modifying the \"tasks\" key.
-                Read https://github.com/PokemonGoF/PokemonGo-Bot/wiki/Configuration-files#configuring-tasks for more information.
-                """.format(flag_name))
-
-        old_flags = ['mode', 'catch_pokemon', 'spin_forts', 'forts_spin', 'hatch_eggs', 'release_pokemon', 'softban_fix',
-                    'longer_eggs_first', 'evolve_speed', 'use_lucky_egg', 'item_filter', 'evolve_all', 'evolve_cp_min',
-                    'max_steps', 'catch_throw_parameters.excellent_rate', 'catch_throw_parameters.great_rate',
-                    'catch_throw_parameters.nice_rate', 'catch_throw_parameters.normal_rate',
-                    'catch_throw_parameters.spin_success_rate']
-        for flag in old_flags:
-            if flag in load:
-                task_configuration_error(flag)
-                return None
-
-        nested_old_flags = [('forts', 'spin'), ('forts', 'move_to_spin'), ('navigator', 'path_mode'), ('navigator', 'path_file'), ('navigator', 'type')]
-        for outer, inner in nested_old_flags:
-            if load.get(outer, {}).get(inner, None):
-                task_configuration_error('{}.{}'.format(outer, inner))
-                return None
-
-        if "evolve_captured" in load:
-            logger.warning('The evolve_captured argument is no longer supported. Please use the EvolvePokemon task instead')
-
-        if "walk" in load:
-            logger.warning('The walk argument is no longer supported. Please use the walk_max and walk_min variables instead')
-
-        if "daily_catch_limit" in load:
-            logger.warning('The daily_catch_limit argument has been moved into the CatchPokemon Task')
-
-        if "logging_color" in load:
-            logger.warning('The logging_color argument has been moved into the logging config section')
-
-        if config.walk_min < 1:
-            parser.error("--walk_min is out of range! (should be >= 1.0)")
-            return None
-
-        if config.alt_min < -413.0:
-            parser.error("--alt_min is out of range! (should be >= -413.0)")
-            return None
-
-        if not (config.location or config.location_cache):
-            parser.error("Needs either --use-location-cache or --location.")
-            return None
-
-        plugin_loader = PluginLoader()
-        for plugin in config.plugins:
-            plugin_loader.load_plugin(plugin)
-
-        # Create web dir if not exists
-        try:
-            os.makedirs(web_dir)
-        except OSError:
-            if not os.path.isdir(web_dir):
-                raise
-
-        fix_nested_config(config)
+        logger.debug(f"Final config file: {config_file}")
         return config, config_file
 
     def _json_loader(filename):
