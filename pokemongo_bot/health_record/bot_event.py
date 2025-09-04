@@ -18,7 +18,7 @@ class BotEvent(object):
             self.logger.info('Health check is enabled. For more information:')
             self.logger.info('https://github.com/PokemonGoF/PokemonGo-Bot/tree/dev#analytics')
 
-        #self.heartbeat_wait = 15 * 60  # seconds
+        self.heartbeat_wait = 15 * 60  # seconds
         self.last_heartbeat = time.time()
 
     def capture_error(self):
