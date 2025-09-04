@@ -419,62 +419,26 @@ def report_summary(bot):
         logger.info('Most Perfect Pokemon: {}'.format(metrics.most_perfect['desc']))
 
 
-    def init_config():
-        parser = argparse.ArgumentParser()
-        config_file = os.path.join(_base_dir, 'configs', 'config.json')
-        auth_file = os.path.join(_base_dir, 'configs', 'auth.json')
-        logger = logging.getLogger(__name__)
-        load = {}
+def init_config():
+    parser = argparse.ArgumentParser()
+    config_file = os.path.join(_base_dir, 'configs', 'config.json')
+    web_dir = "web"
 
-        logger.info(f"Checking for auth file: {auth_file}")
-        if not os.path.exists(auth_file):
-            logger.error(f"No auth file found at {auth_file}")
-            sys.exit(-1)
-        load.update(_json_loader(auth_file))
-
-        logger.info(f"Checking for config file: {config_file}")
-        if os.path.exists(config_file):
-            load.update(_json_loader(config_file))
-        else:
-            logger.warning(f"No config file found at {config_file}, proceeding with auth only")
-
-        # Parse command-line arguments
-        parser.add_argument("-cf", "--config", help="Config File to use")
-        parser.add_argument("-af", "--auth", help="Auth File to use")
-        config = parser.parse_args([], namespace=argparse.Namespace(**load))
-        config_file = config.config or config_file
-        logger.debug(f"Final config file: {config_file}")
-        return config, config_file
+    # If config file exists, load variables from json
+    load = {}
 
     def _json_loader(filename):
-        load = {}
-        logger = logging.getLogger(__name__)
-        logger.debug(f"Attempting to load configuration file: {filename}")
-        if not os.path.exists(filename):
-            logger.error(f"Configuration file not found: {filename}")
-            sys.exit(-1)
         try:
-            # Use text mode with explicit encoding to avoid binary mode issues
-            with open(filename, 'r', encoding='utf-8') as data:
-                logger.debug(f"Successfully opened {filename}")
-                content = data.read()
-                logger.debug(f"File content (first 100 chars): {content[:100]}...")
-                load.update(json.loads(content))
-        except OSError as e:
-            logger.error(f"OS error reading {filename}: {e}")
-            sys.exit(-1)
-        except ValueError as e:
-            logger.error(f"JSON parsing error in {filename}: {e}")
+            with open(filename, 'rb') as data:
+                load.update(json.load(data))
+        except ValueError:
             if jsonlint:
-                logger.debug("Running jsonlint to validate JSON")
-                lint = jsonlint()
-                rc = lint.main(['-v', filename])
+                with open(filename, 'rb') as data:
+                    lint = jsonlint()
+                    rc = lint.main(['-v', filename])
+
+            logger.critical('Error with configuration file')
             sys.exit(-1)
-        except Exception as e:
-            logger.error(f"Unexpected error reading {filename}: {e}")
-            sys.exit(-1)
-        logger.debug(f"Successfully loaded {filename}")
-        return load
 
     # Select a config file code
     parser.add_argument("-cf", "--config", help="Config File to use")
