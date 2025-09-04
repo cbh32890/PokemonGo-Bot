@@ -239,9 +239,7 @@ def main():
         # convert namespace to dict if needed
         config_dict = vars(config) if isinstance(config, Namespace) else config
         health_record = BotEvent(config_dict)
-        print("I'm here 1")
         health_record.login_success()
-        print("I'm here 2")
 
         setup_logging(config)
 

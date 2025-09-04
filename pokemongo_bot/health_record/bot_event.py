@@ -10,46 +10,60 @@ class BotEvent(object):
     def __init__(self, config):
         self.config = config
         self.logger = logging.getLogger(__name__)
-        client_uuid = uuid.uuid4()
-        self.client_id = str(client_uuid)
-        # UniversalAnalytics can be reviewed here:
-        # https://github.com/analytics-pros/universal-analytics-python
-        if self.config.get('health_record'):
+        self.client_id = str(uuid.uuid4())
+        self.enabled = self.config.get('health_record', False)
+        if self.enabled:
             self.logger.info('Health check is enabled. For more information:')
             self.logger.info('https://github.com/PokemonGoF/PokemonGo-Bot/tree/dev#analytics')
-
+        else:
+            self.logger.info('Health check is disabled, skipping analytics requests.')
         self.heartbeat_wait = 15 * 60  # seconds
         self.last_heartbeat = time.time()
 
     def capture_error(self):
-        if self.config.get('health_record'):
-            self.logger.error("Sentry error reporting is disabled")
+        if not self.enabled:
+            self.logger.debug("Health check disabled, skipping capture_error")
+            return
+        self.logger.error("Sentry error reporting is disabled")
 
     def login_success(self):
-        if self.config.get('health_record'):
-            self.last_heartbeat = time.time()
-            self.track_url('/loggedin')
+        if not self.enabled:
+            self.logger.debug("Health check disabled, skipping login_success")
+            return
+        self.last_heartbeat = time.time()
+        self.track_url('/loggedin')
 
     def login_failed(self):
-        if self.config.get('health_record'):
-            self.track_url('/login')
+        if not self.enabled:
+            self.logger.debug("Health check disabled, skipping login_failed")
+            return
+        self.track_url('/login')
 
     def login_retry(self):
-        if self.config.get('health_record'):
-            self.track_url('/relogin')
+        if not self.enabled:
+            self.logger.debug("Health check disabled, skipping login_retry")
+            return
+        self.track_url('/relogin')
 
     def logout(self):
-        if self.config.get('health_record'):
-            self.track_url('/logout')
+        if not self.enabled:
+            self.logger.debug("Health check disabled, skipping logout")
+            return
+        self.track_url('/logout')
 
     def heartbeat(self):
-        if self.config.get('health_record'):
-            current_time = time.time()
-            if current_time - self.heartbeat_wait > self.last_heartbeat:
-                self.last_heartbeat = current_time
-                self.track_url('/heartbeat')
+        if not self.enabled:
+            self.logger.debug("Health check disabled, skipping heartbeat")
+            return
+        current_time = time.time()
+        if current_time - self.last_heartbeat > self.heartbeat_wait:
+            self.last_heartbeat = current_time
+            self.track_url('/heartbeat')
 
     def track_url(self, path):
+        if not self.enabled:
+            self.logger.debug("Health check disabled, skipping track_url: %s", path)
+            return
         data = {
             'v': '1',
             'tid': 'UA-81469507-1',
@@ -59,8 +73,15 @@ class BotEvent(object):
             'dp': path
         }
         try:
+            self.logger.debug("Sending POST to http://www.google-analytics.com/collect for %s", path)
             response = requests.post(
-                'http://www.google-analytics.com/collect', data=data)
+                'http://www.google-analytics.com/collect',
+                data=data,
+                timeout=5  # 5-second timeout
+            )
             response.raise_for_status()
-        except requests.exceptions.HTTPError:
-            pass
+            self.logger.debug("track_url %s succeeded: %s", path, response.status_code)
+        except requests.exceptions.Timeout:
+            self.logger.warning("track_url %s timed out after 5 seconds", path)
+        except requests.exceptions.RequestException as e:
+            self.logger.warning("track_url %s failed: %s", path, e)
