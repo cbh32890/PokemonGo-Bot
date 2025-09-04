@@ -92,8 +92,6 @@ class ApiWrapper(PGoApi, object):
         country_code = "US"
         timezone = "America/Chicago"
         geolocator = GoogleV3(api_key=self.config.gmapkey)
-        
-        print("I'm here")
 
         if self.config.locale_by_location:
             try:
@@ -174,6 +172,7 @@ class ApiWrapper(PGoApi, object):
 
 class ApiRequest(PGoApiRequest):
     def __init__(self, *args):
+        # issue is here
         PGoApiRequest.__init__(self, *args)
         self.logger = logging.getLogger(__name__)
         self.request_callers = []

@@ -34,3 +34,4 @@ selenium>=4.25.0
 pytz>=2024.2
 git+https://github.com/cbh32890/protobuf-to-dict.git@master
 pycryptodome>=3.20.0
+setuptools<81

@@ -428,17 +428,34 @@ def init_config():
     load = {}
 
     def _json_loader(filename):
-        try:
-            with open(filename, 'rb') as data:
-                load.update(json.load(data))
-        except ValueError:
-            if jsonlint:
-                with open(filename, 'rb') as data:
-                    lint = jsonlint()
-                    rc = lint.main(['-v', filename])
-
-            logger.critical('Error with configuration file')
+        load = {}
+        logger = logging.getLogger(__name__)
+        logger.debug(f"Attempting to load configuration file: {filename}")
+        if not os.path.exists(filename):
+            logger.error(f"Configuration file not found: {filename}")
             sys.exit(-1)
+        try:
+            # Use text mode with explicit encoding to avoid binary mode issues
+            with open(filename, 'r', encoding='utf-8') as data:
+                logger.debug(f"Successfully opened {filename}")
+                content = data.read()
+                logger.debug(f"File content (first 100 chars): {content[:100]}...")
+                load.update(json.loads(content))
+        except OSError as e:
+            logger.error(f"OS error reading {filename}: {e}")
+            sys.exit(-1)
+        except ValueError as e:
+            logger.error(f"JSON parsing error in {filename}: {e}")
+            if jsonlint:
+                logger.debug("Running jsonlint to validate JSON")
+                lint = jsonlint()
+                rc = lint.main(['-v', filename])
+            sys.exit(-1)
+        except Exception as e:
+            logger.error(f"Unexpected error reading {filename}: {e}")
+            sys.exit(-1)
+        logger.debug(f"Successfully loaded {filename}")
+        return load
 
     # Select a config file code
     parser.add_argument("-cf", "--config", help="Config File to use")
@@ -852,7 +869,7 @@ def init_config():
     # Start to parse other attrs
     config = parser.parse_args()
     if not config.username and 'username' not in load:
-        config.username = raw_input("Username: ")
+        config.username = input("Username: ")
     if not config.password and 'password' not in load:
         config.password = getpass("Password: ")
 
